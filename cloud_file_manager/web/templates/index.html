@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud File Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-sm-8 col-xs-8">
+            <button type="button" class="btn btn-success btn-sm" onclick="create();">Create</button>
+            <button type="button" class="btn btn-warning btn-sm" onclick="rename();">Rename</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="delete();">Delete</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-sm-8 col-xs-8">
+            <div id="tree"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+
+    $('#tree').jstree({
+      "core" : {
+        "animation" : 0,
+        "check_callback" : true,
+        "themes" : { "stripes" : true },
+        'data' : [
+            'Simple root node',
+            {
+                'id' : 'node_2',
+                'text' : 'Root node with options',
+                'state' : { 'opened' : true, 'selected' : true },
+                'children' : [ { 'text' : 'Child 1' }, 'Child 2']
+            }
+        ]
+      },
+      "types" : {
+        "#" : {
+          "max_children" : 1,
+          "max_depth" : 4,
+          "valid_children" : ["root"]
+        },
+        "root" : {
+          "icon" : "/static/3.3.5/assets/images/tree_icon.png",
+          "valid_children" : ["default"]
+        },
+        "default" : {
+          "valid_children" : ["default","file"]
+        },
+        "file" : {
+          "icon" : "glyphicon glyphicon-file",
+          "valid_children" : []
+        }
+      },
+      "plugins" : [
+        "contextmenu", "dnd", "search",
+        "state", "types", "wholerow"
+      ]
+    });
+
+})
+</script>
+
+</body>
+</html>
