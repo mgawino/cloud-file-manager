@@ -1,0 +1,9 @@
+version: '2.1'
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4572:4572"
+    environment:
+      - SERVICES=s3
