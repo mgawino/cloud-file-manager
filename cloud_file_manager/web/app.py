@@ -1,4 +1,8 @@
+import flask_injector
+from flask_injector import FlaskInjector
 from flask import Flask, render_template, jsonify, send_from_directory, Response
+
+from cloud_file_manager.services.data_manager import DataManager
 
 app = Flask(__name__)
 
@@ -14,25 +18,9 @@ def index():
 
 
 @app.route('/tree', methods=['GET'])
-def tree():
-    return jsonify([
-        {
-            'id': 'node_2',
-            'text': 'Bucket 1',
-            'type': 'bucket',
-            'children': [
-                {
-                    'text': 'Folder 1',
-                    'type': 'folder',
-                    'children': [{'text': 'file1', 'type': 'file'}]
-                },
-                {
-                    'text': 'Folder 2',
-                    'type': 'folder'
-                }
-            ]
-        }
-    ])
+def tree(data_manager: DataManager):
+    tree = data_manager.get_tree()
+    return jsonify(tree)
 
 
 @app.route('/node', methods=['POST'])
@@ -50,5 +38,18 @@ def node_delete():
     return Response()
 
 
+def configure_dependencies():
+
+    def configure(binder):
+        binder.bind(
+            DataManager,
+            to=DataManager.from_environ_config(),
+            scope=flask_injector.request
+        )
+
+    FlaskInjector(app=app, modules=[configure])
+
+
 if __name__ == '__main__':
+    configure_dependencies()
     app.run(debug=True)
