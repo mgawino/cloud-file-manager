@@ -6,7 +6,7 @@ from cloud_file_manager.services.s3_client import S3Client
 from cloud_file_manager.services.tree_builder import JSTreeBuilder
 
 
-class DataManager:
+class FileManager:
 
     def __init__(self, s3_client: S3Client, tree_builder: JSTreeBuilder):
         self.s3_client = s3_client
@@ -17,7 +17,7 @@ class DataManager:
         boto_s3_client = boto3.client('s3', endpoint_url=os.environ.get('S3_ENDPOINT_URL'))
         s3_client = S3Client(boto_s3_client)
         js_tree_builder = JSTreeBuilder()
-        return DataManager(s3_client, js_tree_builder)
+        return FileManager(s3_client, js_tree_builder)
 
     @staticmethod
     def _split_path(path):

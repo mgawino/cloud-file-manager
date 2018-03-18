@@ -7,17 +7,17 @@ from flask.testing import FlaskClient
 from flask_injector import FlaskInjector
 from werkzeug.wrappers import BaseResponse
 
-from cloud_file_manager.services.data_manager import DataManager
+from cloud_file_manager.services.file_manager import FileManager
 from cloud_file_manager.web.app import app
 
 
 @pytest.fixture()
-def flask_app(data_manager):
+def flask_app(file_manager):
 
     def configure(binder):
         binder.bind(
-            DataManager,
-            to=data_manager,
+            FileManager,
+            to=file_manager,
             scope=flask_injector.request
         )
 
