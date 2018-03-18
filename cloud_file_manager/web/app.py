@@ -1,4 +1,5 @@
 import flask_injector
+import os
 from flask_injector import FlaskInjector
 from flask import Flask, render_template, jsonify, send_from_directory, Response, request
 
@@ -58,4 +59,4 @@ def configure_dependencies():
 
 if __name__ == '__main__':
     configure_dependencies()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('APP_PORT', 5000)))
