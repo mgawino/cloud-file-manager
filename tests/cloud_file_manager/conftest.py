@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
+import json
+from unittest.mock import Mock
 
 import boto3
+import flask_injector
+from flask_injector import FlaskInjector
 import pytest
+from cached_property import cached_property
+from cloud_file_manager.web.app import app
+from flask.testing import FlaskClient
+from werkzeug.wrappers import BaseResponse
 
 from cloud_file_manager.services.file_manager import FileManager
 from cloud_file_manager.services.s3_client import S3Client
@@ -25,18 +33,12 @@ def boto_s3_client(request):
             delete_bucket_objects(bucket['Name'])
             client.delete_bucket(Bucket=bucket['Name'])
 
-    def create_bucket_with_empty_keys(bucket_name, keys):
-        client.create_bucket(Bucket=bucket_name)
-        for key in keys:
-            client.put_object(Bucket=bucket_name, Key=key, Body=b'')
-
     client = boto3.client(
         's3',
         endpoint_url='http://localhost:4572',
         aws_access_key_id='test_access_key',
         aws_secret_access_key='test_secret_key'
     )
-    client.create_bucket_with_empty_keys = create_bucket_with_empty_keys
     request.addfinalizer(delete_all_buckets)
 
     return client
@@ -55,3 +57,61 @@ def js_tree_builder():
 @pytest.fixture()
 def file_manager(s3_client, js_tree_builder):
     return FileManager(s3_client, js_tree_builder)
+
+
+@pytest.fixture()
+def flask_app():
+
+    class Response(BaseResponse):
+
+        @cached_property
+        def json(self):
+            return json.loads(self.data.decode('utf-8'))
+
+    class TestClient(FlaskClient):
+        def open(self, *args, **kwargs):
+            if 'json' in kwargs:
+                kwargs['data'] = json.dumps(kwargs.pop('json'))
+                kwargs['content_type'] = 'application/json'
+            return super(TestClient, self).open(*args, **kwargs)
+
+    app.response_class = Response
+    app.test_client_class = TestClient
+    app.testing = True
+
+    return app
+
+
+@pytest.fixture()
+def app_test_client(flask_app, file_manager):
+
+    def configure(binder):
+        binder.bind(
+            FileManager,
+            to=file_manager,
+            scope=flask_injector.request
+        )
+
+    FlaskInjector(app=flask_app, modules=[configure])
+
+    return flask_app.test_client()
+
+
+@pytest.fixture()
+def file_manager_mock():
+    return Mock(spec_set=FileManager)
+
+
+@pytest.fixture()
+def mocked_app_test_client(flask_app, file_manager_mock):
+
+    def configure(binder):
+        binder.bind(
+            FileManager,
+            to=file_manager_mock,
+            scope=flask_injector.request
+        )
+
+    FlaskInjector(app=app, modules=[configure])
+
+    return flask_app.test_client()
