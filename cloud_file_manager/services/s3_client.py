@@ -28,8 +28,9 @@ class S3Client:
     def delete_bucket(self, bucket_name):
         self.boto_s3_client.delete_bucket(Bucket=bucket_name)
 
-    def create_key(self, bucket_name, s3_key):
-        self.boto_s3_client.put_object(Bucket=bucket_name, Key=s3_key, Body=b'')
+    def create_keys(self, bucket_name, s3_keys):
+        for s3_key in s3_keys:
+            self.boto_s3_client.put_object(Bucket=bucket_name, Key=s3_key, Body=b'')
 
     def delete_keys(self, bucket_name, s3_prefix=None):
         keys_to_delete = self.list_bucket_keys(bucket_name, s3_prefix)
@@ -44,11 +45,9 @@ class S3Client:
         source_keys = self.list_bucket_keys(bucket_name, source_s3_prefix)
         new_keys = [key.replace(source_s3_prefix, destination_s3_prefix)
                     for key in source_keys]
-        for new_key in new_keys:
-            self.create_key(bucket_name, new_key)
+        self.create_keys(bucket_name, new_keys)
         self.delete_keys(bucket_name, source_s3_prefix)
 
     def copy_bucket(self, source_bucket, destination_bucket):
         source_keys = self.list_bucket_keys(source_bucket)
-        for key in source_keys:
-            self.create_key(destination_bucket, key)
+        self.create_keys(destination_bucket, source_keys)

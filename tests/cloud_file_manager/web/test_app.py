@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock
 
 import pytest
 import flask_injector
@@ -12,22 +13,7 @@ from cloud_file_manager.web.app import app
 
 
 @pytest.fixture()
-def flask_app(file_manager):
-
-    def configure(binder):
-        binder.bind(
-            FileManager,
-            to=file_manager,
-            scope=flask_injector.request
-        )
-
-    FlaskInjector(app=app, modules=[configure])
-
-    return app
-
-
-@pytest.fixture()
-def app_test_client(flask_app):
+def flask_app():
 
     class Response(BaseResponse):
         @cached_property
@@ -41,9 +27,44 @@ def app_test_client(flask_app):
                 kwargs['content_type'] = 'application/json'
             return super(TestClient, self).open(*args, **kwargs)
 
-    flask_app.response_class = Response
-    flask_app.test_client_class = TestClient
-    flask_app.testing = True
+    app.response_class = Response
+    app.test_client_class = TestClient
+    app.testing = True
+
+    return app
+
+
+@pytest.fixture()
+def app_test_client(flask_app, file_manager):
+
+    def configure(binder):
+        binder.bind(
+            FileManager,
+            to=file_manager,
+            scope=flask_injector.request
+        )
+
+    FlaskInjector(app=flask_app, modules=[configure])
+
+    return flask_app.test_client()
+
+
+@pytest.fixture()
+def file_manager_mock():
+    return Mock(spec_set=FileManager)
+
+
+@pytest.fixture()
+def mocked_app_test_client(flask_app, file_manager_mock):
+
+    def configure(binder):
+        binder.bind(
+            FileManager,
+            to=file_manager_mock,
+            scope=flask_injector.request
+        )
+
+    FlaskInjector(app=app, modules=[configure])
 
     return flask_app.test_client()
 

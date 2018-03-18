@@ -12,8 +12,7 @@ def test_list_bucket_names(s3_client):
 
 def test_list_bucket_keys(s3_client):
     s3_client.create_bucket('bucket')
-    s3_client.create_key('bucket', 'a/b/c')
-    s3_client.create_key('bucket', 'a/d/e')
+    s3_client.create_keys('bucket', ['a/b/c', 'a/d/e'])
 
     bucket_keys = s3_client.list_bucket_keys('bucket')
     sorted_keys = sorted(bucket_keys)
@@ -23,8 +22,7 @@ def test_list_bucket_keys(s3_client):
 
 def test_move_keys(s3_client):
     s3_client.create_bucket('bucket')
-    s3_client.create_key('bucket', 'a/b/c')
-    s3_client.create_key('bucket', 'a/b/d')
+    s3_client.create_keys('bucket', ['a/b/c', 'a/b/d'])
 
     s3_client.move_keys('bucket', 'a/b', 'a/e')
     sorted_keys = sorted(s3_client.list_bucket_keys('bucket'))
@@ -35,8 +33,7 @@ def test_move_keys(s3_client):
 def test_copy_bucket(s3_client):
     s3_client.create_bucket('bucket1')
     s3_client.create_bucket('bucket2')
-    s3_client.create_key('bucket1', 'a/b')
-    s3_client.create_key('bucket1', 'c/d')
+    s3_client.create_keys('bucket1', ['a/b', 'c/d'])
 
     s3_client.copy_bucket('bucket1', 'bucket2')
     first_bucket_keys = s3_client.list_bucket_keys('bucket1')

@@ -40,7 +40,7 @@ class FileManager:
         if not s3_key:
             self.s3_client.create_bucket(bucket_name)
         else:
-            self.s3_client.create_key(bucket_name, s3_key)
+            self.s3_client.create_keys(bucket_name, [s3_key])
 
     def rename_node(self, old_path, new_path):
         old_bucket_name, old_s3_key = self._split_path(old_path)
@@ -51,7 +51,7 @@ class FileManager:
                 source_bucket=old_bucket_name,
                 destination_bucket=new_bucket_name
             )
-            self.s3_client.delete_bucket(old_bucket_name)
+            self.delete_node(old_path)
         else:
             self.s3_client.move_keys(
                 bucket_name=new_bucket_name,
