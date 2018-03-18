@@ -5,6 +5,7 @@ import pytest
 
 from cloud_file_manager.services.data_manager import DataManager
 from cloud_file_manager.services.s3_client import S3Client
+from cloud_file_manager.services.tree_builder import JSTreeBuilder
 
 
 @pytest.fixture()
@@ -47,5 +48,10 @@ def s3_client(boto_s3_client):
 
 
 @pytest.fixture()
-def data_manager(s3_client):
-    return DataManager(s3_client)
+def js_tree_builder():
+    return JSTreeBuilder()
+
+
+@pytest.fixture()
+def data_manager(s3_client, js_tree_builder):
+    return DataManager(s3_client, js_tree_builder)
