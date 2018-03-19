@@ -1,12 +1,12 @@
 
 
-def test_app_index(app_test_client):
+def test_index(app_test_client):
     response = app_test_client.get('/')
 
     assert response.status_code == 200
 
 
-def test_app_create_node(app_test_client):
+def test_create_node(app_test_client):
     create_response1 = app_test_client.post('/node', json={'path': 'test'})
     create_response2 = app_test_client.post('/node', json={'path': 'test/a'})
 
@@ -24,7 +24,7 @@ def test_app_create_node(app_test_client):
     ]
 
 
-def test_app_rename_node(app_test_client):
+def test_rename_node(app_test_client):
     create_response1 = app_test_client.post('/node', json={'path': 'test'})
     create_response2 = app_test_client.post('/node', json={'path': 'test/a'})
     create_response3 = app_test_client.post('/node', json={'path': 'test/a/b'})
@@ -55,7 +55,7 @@ def test_app_rename_node(app_test_client):
     ]
 
 
-def test_app_delete_node(app_test_client):
+def test_delete_node(app_test_client):
     create_response1 = app_test_client.post('/node', json={'path': 'test'})
     create_response2 = app_test_client.post('/node', json={'path': 'test/a'})
 

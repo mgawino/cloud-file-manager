@@ -21,11 +21,11 @@ class FileManager:
 
     @staticmethod
     def _split_path(path):
-        splitted = path.split(os.sep, 1)
-        if len(splitted) == 1:
-            return splitted[0], ''
+        parts = path.split(os.sep, 1)
+        if len(parts) == 1:
+            return parts[0], ''
         else:
-            return splitted
+            return parts
 
     def get_tree(self):
         bucket_names = self.s3_client.list_bucket_names()

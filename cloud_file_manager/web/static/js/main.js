@@ -98,17 +98,17 @@ $(document).ready(function(){
       "core": {
         "animation": 0,
         "check_callback": true,
-        "themes" : {"stripes": true},
         "data" : {"url": "/tree"}
       },
       "types" : {
         "bucket": {
           "icon": "/static/icons/bucket",
-          "valid_children": ["folder", "file"]
+          "valid_children": ["folder"]
+        },
+        "folder": {
+          "valid_children": ["folder"]
         }
       },
-      "plugins" : [
-        "contextmenu", "dnd", "search", "state", "types", "wholerow"
-      ]
+      "plugins" : ["state", "types"]
     });
 })

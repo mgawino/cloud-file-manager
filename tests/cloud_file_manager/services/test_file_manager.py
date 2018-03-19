@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
+import operator
+
 from cloud_file_manager.services.file_manager import FileManager
 
 
-def test_file_manager_create_from_config():
+def test_create_from_config():
     file_manager = FileManager.create_from_environ()
 
 
-def test_get_tree(file_manager):
+def test_get_tree_with_many_roots(file_manager):
     file_manager.create_node('test')
+    file_manager.create_node('test2')
     file_manager.create_node('test/a')
-    file_manager.create_node('test/a/b')
+    file_manager.create_node('test2/a')
 
     tree = file_manager.get_tree()
+    sorted_tree = sorted(tree, key=operator.itemgetter('text'))
 
-    assert tree == [
+    assert sorted_tree == [
         {
             'text': 'test',
             'type': 'bucket',
@@ -21,27 +25,10 @@ def test_get_tree(file_manager):
                 {
                     'text': 'a',
                     'type': 'folder',
-                    'children': [
-                        {
-                            'text': 'b',
-                            'type': 'folder',
-                            'children': []
-                        }
-                    ]
+                    'children': []
                 }
             ]
-        }
-    ]
-
-
-def test_rename_node(file_manager):
-    file_manager.create_node('test')
-    file_manager.create_node('test/a')
-
-    file_manager.rename_node('test', 'test2')
-    tree = file_manager.get_tree()
-
-    assert tree == [
+        },
         {
             'text': 'test2',
             'type': 'bucket',
@@ -56,7 +43,30 @@ def test_rename_node(file_manager):
     ]
 
 
-def test_delete_node(file_manager):
+def test_rename_node(file_manager):
+    file_manager.create_node('test')
+    file_manager.create_node('test/a')
+    file_manager.create_node('test/a/b')
+
+    file_manager.rename_node('test/a', 'test/c')
+    tree = file_manager.get_tree()
+
+    assert tree == [
+        {
+            'text': 'test',
+            'type': 'bucket',
+            'children': [
+                {
+                    'text': 'c',
+                    'type': 'folder',
+                    'children': [{'text': 'b', 'type': 'folder', 'children': []}]
+                }
+            ]
+        }
+    ]
+
+
+def test_delete_root_node(file_manager):
     file_manager.create_node('test')
     file_manager.create_node('test/a')
 
