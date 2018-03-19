@@ -51,7 +51,8 @@ class FileManager:
                 source_bucket=old_bucket_name,
                 destination_bucket=new_bucket_name
             )
-            self.delete_node(old_path)
+            self.s3_client.delete_keys(old_bucket_name)
+            self.s3_client.delete_bucket(old_bucket_name)
         else:
             self.s3_client.move_keys(
                 bucket_name=new_bucket_name,

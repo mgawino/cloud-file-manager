@@ -98,8 +98,13 @@ def app_test_client(flask_app, file_manager):
 
 
 @pytest.fixture()
-def file_manager_mock():
-    return Mock(spec_set=FileManager)
+def s3_client_mock():
+    return Mock(spec_set=S3Client)
+
+
+@pytest.fixture()
+def file_manager_mock(s3_client_mock, js_tree_builder):
+    return FileManager(s3_client_mock, js_tree_builder)
 
 
 @pytest.fixture()
