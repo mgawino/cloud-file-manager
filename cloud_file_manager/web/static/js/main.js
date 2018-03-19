@@ -46,14 +46,11 @@ function on_rename_node(data) {
         var create_data = {
             path: tree.get_path(node, '/', false)
         };
-        $.post('/node', create_data, function(data) {
-            console.log('Created node');
-        }).fail(function() {
+        $.post('/node', create_data).fail(function() {
             console.log('Create node failed');
             tree.delete_node(node);
         });
     } else {
-        console.log(data);
         if (data.node.parent == '#') {
             var old_path = data.old;
         } else {
@@ -64,10 +61,9 @@ function on_rename_node(data) {
             old_path: old_path,
             new_path: tree.get_path(node, '/', false)
         }
-        $.put('/node', rename_data, function(data) {
-            console.log('Renamed node');
-        }).fail(function() {
+        $.put('/node', rename_data).fail(function() {
             console.log('Rename node failed');
+            tree.rename_node(data.node, data.old);
         });
     }
 
@@ -84,7 +80,6 @@ function delete_node() {
         path: tree.get_path(selected, '/', false)
     }
     $.delete('/node', delete_data, function(data) {
-        console.log('Deleted node');
         tree.delete_node(selected);
     }).fail(function() {
         console.log('Delete node failed');
